@@ -71,6 +71,7 @@ let majorVersion = "6";
       ++ optional langAda ./gnat-glibc234.patch
       ++ optional langFortran ../gfortran-driving.patch
       ++ optional (targetPlatform.libc == "musl") ../libgomp-dont-force-initial-exec.patch
+      ++ optional langGo ./gogcc-workaround-glibc-2.36.patch
 
       # Obtain latest patch with ../update-mcfgthread-patches.sh
       ++ optional (!crossStageStatic && targetPlatform.isMinGW) ./Added-mcf-thread-model-support-from-mcfgthread.patch
