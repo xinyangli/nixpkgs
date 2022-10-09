@@ -380,6 +380,10 @@ self: super:
     outputs = [ "out" "dev" ]; # mainly to get rid of propagating others
   });
 
+  xdm = super.xdm.overrideAttrs ({ patches ? [], ... }: {
+    patches = patches ++ [ ./xdm-fix-header-inclusion.patch ];
+  });
+
   xf86inputevdev = super.xf86inputevdev.overrideAttrs (attrs: {
     outputs = [ "out" "dev" ]; # to get rid of xorgserver.dev; man is tiny
     preBuild = "sed -e '/motion_history_proc/d; /history_size/d;' -i src/*.c";
