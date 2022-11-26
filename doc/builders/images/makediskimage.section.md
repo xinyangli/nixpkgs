@@ -5,7 +5,7 @@
 There are two operations mode for this function:
 
 - either, you want only a Nix store disk image, it can be done using `cptofs` without any virtual machine involved ;
-- either, you want a full NixOS install on the disk, it will start a virtual machine to perform various tasks such as partitionning, installation and bootloader installation.
+- or, you want a full NixOS install on the disk, it will start a virtual machine to perform various tasks such as partitionning, installation and bootloader installation.
 
 When NixOS tests are running, this function gets called to generate potentially two kinds of disk images:
 
@@ -15,7 +15,7 @@ When NixOS tests are running, this function gets called to generate potentially 
 ## Features
 
 - whether to produce a Nix-store only image or not, **this can be incompatible with other options**
-- arbitrary NixOS configuration ;
+- arbitrary NixOS configuration
 - multiple partition table layouts: EFI, legacy, legacy + GPT, hybrid, none ;
 - automatic or bound disk size: `diskSize` parameter, `additionalSpace` can be set when `diskSize` is `auto` to add a constant of disk space ;
 - boot partition size when partition table is `efi` or `hybrid` ;
@@ -35,7 +35,6 @@ Images are **NOT** deterministic, please do not hesitate to try to fix this, sou
 
 - bootloader installation have timestamps ;
 - SQLite Nix store database contain registration times ;
-- UIDs / GIDs Nix mappings are in a non-deterministic order ;
 - `/etc/shadow` is in a non-deterministic order
 
 For more, read the function signature source code for documentation on arguments: <https://github.com/NixOS/nixpkgs/blob/master/nixos/lib/make-disk-image.nix>.
@@ -103,20 +102,22 @@ in
 
 It relies on the [LKL (Linux Kernel Library) project](https://github.com/lkl/linux) which provides Linux kernel as userspace library.
 
-Note that Nix-store only image only need to run LKL tools to produce an image and will never spawn a virtual machine, whereas full images will always require a virtual machine, but also use LKL.
+::: {.note}
+The Nix-store only image only need to run LKL tools to produce an image and will never spawn a virtual machine, whereas full images will always require a virtual machine, but also use LKL.
+:::
 
 ### Image preparation phase
 
 Image preparation phase will produce the initial image layout in a folder:
 
 - devise a root folder based on `$PWD`
-- preparing the contents by copying and restoring ACLs in this root folder ;
-- load in the Nix store database all additional paths computed by `pkgs.closureInfo` in a temporary Nix store ;
-- run `nixos-install` in a temporary folder ;
-- transfer from the temporary store the additional paths registered to the installed NixOS ;
-- do fancy computations for the size of the disk image based on the apparent size of the root folder ;
-- partition the disk image using the corresponding script according to the partition table type ;
-- format the partitions if needed ;
+- preparing the contents by copying and restoring ACLs in this root folder
+- load in the Nix store database all additional paths computed by `pkgs.closureInfo` in a temporary Nix store
+- run `nixos-install` in a temporary folder
+- transfer from the temporary store the additional paths registered to the installed NixOS
+- do fancy computations for the size of the disk image based on the apparent size of the root folder
+- partition the disk image using the corresponding script according to the partition table type
+- format the partitions if needed
 - use `cptofs` (LKL tool) to copy the root folder inside the disk image
 
 At this step, the disk image contains already the Nix store, it only needs to be converted to the desired format to be used.
