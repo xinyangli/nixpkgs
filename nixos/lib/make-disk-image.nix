@@ -449,6 +449,13 @@ let format' = format; in let
 
       rootDisk=${if partitionTableType != "none" then "/dev/vda${rootPartition}" else "/dev/vda"}
 
+      # It is necessary to set rootGUID in advance, otherwise
+      # bootloader might get the wrong one and failed to boot.
+      # At the end, we reset again because we want deterministic timestamps.
+      ${optionalString (fsType == "ext4" && deterministic) ''
+        tune2fs -T now ${optionalString deterministic "-U ${rootGUID}"} -c 0 -i 0 $rootDisk
+      ''}
+
       # Some tools assume these exist
       ln -s vda /dev/xvda
       ln -s vda /dev/sda
@@ -482,10 +489,6 @@ let format' = format; in let
         ${optionalString (config.boot.loader.grub.device != "/dev/vda") ''
             ln -s /dev/vda ${config.boot.loader.grub.device}
         ''}
-        # TODO: needed?
-        # For GRUB 0.97 compatibility
-        mkdir -p /mnt/boot/grub
-        echo '(hd0) /dev/vda' > /mnt/boot/grub/device.map
 
         # Set up core system link, bootloader (sd-boot, GRUB, uboot, etc.), etc.
         NIXOS_INSTALL_BOOTLOADER=1 nixos-enter --root $mountPoint -- /nix/var/nix/profiles/system/bin/switch-to-configuration boot
