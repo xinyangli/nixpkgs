@@ -55,8 +55,8 @@ import ./make-test-python.nix ({ lib, pkgs, ... }: {
 
     # Create encrypted volume
     machine.wait_for_unit("multi-user.target")
-    machine.succeed("echo -n supersecret | cryptsetup luksFormat -q --iter-time=1 /dev/vdc -")
-    machine.succeed("PASSWORD=supersecret SYSTEMD_LOG_LEVEL=debug systemd-cryptenroll --tpm2-pcrs= --tpm2-device=auto /dev/vdc |& systemd-cat")
+    machine.succeed("echo -n supersecret | cryptsetup luksFormat -q --iter-time=1 /dev/vdb -")
+    machine.succeed("PASSWORD=supersecret SYSTEMD_LOG_LEVEL=debug systemd-cryptenroll --tpm2-pcrs= --tpm2-device=auto /dev/vdb |& systemd-cat")
 
     # Boot from the encrypted disk
     machine.succeed("bootctl set-default nixos-generation-1-specialisation-boot-luks.conf")
