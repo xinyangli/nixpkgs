@@ -16,7 +16,7 @@ When NixOS tests are running, this function gets called to generate potentially 
 
 - whether to produce a Nix-store only image or not, **this can be incompatible with other options**
 - arbitrary NixOS configuration
-- multiple partition table layouts: EFI, legacy, legacy + GPT, hybrid, none ;
+- multiple partition table layouts: EFI, legacy, legacy + GPT, hybrid, none through `partitionTableType` parameter ;
 - automatic or bound disk size: `diskSize` parameter, `additionalSpace` can be set when `diskSize` is `auto` to add a constant of disk space ;
 - boot partition size when partition table is `efi` or `hybrid` ;
 - arbitrary contents with permissions can be placed in the target filesystem using `contents`, incompatible with Nix-store only image
@@ -143,7 +143,7 @@ It is unsuitable for UEFI.
 This partition table type uses GPT and:
 
 - create a "no filesystem" partition from 1MiB to 2MiB ;
-- set `bios_grub` flag on this "no filesystem" partition, which is some sort of MBR ;
+- set `bios_grub` flag on this "no filesystem" partition, which marks it as a [GRUB BIOS partition](https://www.gnu.org/software/parted/manual/html_node/set.html) ;
 - create a primary ext4 partition starting at 2MiB and extending to the full disk image ;
 - perform optimal alignments checks on each partition
 
