@@ -1398,4 +1398,53 @@ runTests {
     expr = (with types; either int (listOf (either bool str))).description;
     expected = "signed integer or list of (boolean or string)";
   };
+
+  testRelativeNormaliseExample1 = {
+    expr = path.relativeNormalise "foo//bar";
+    expected = "./foo/bar";
+  };
+  testRelativeNormaliseExample2 = {
+    expr = path.relativeNormalise "foo/./bar";
+    expected = "./foo/bar";
+  };
+  testRelativeNormaliseExample3 = {
+    expr = path.relativeNormalise "foo/bar";
+    expected = "./foo/bar";
+  };
+  testRelativeNormaliseExample4 = {
+    expr = path.relativeNormalise "foo/bar/";
+    expected = "./foo/bar";
+  };
+  testRelativeNormaliseExample5 = {
+    expr = path.relativeNormalise "foo/bar/.";
+    expected = "./foo/bar";
+  };
+  testRelativeNormaliseExample6 = {
+    expr = path.relativeNormalise ".";
+    expected = "./.";
+  };
+  testRelativeNormaliseExample7 = {
+    expr = (builtins.tryEval (path.relativeNormalise "foo/../bar")).success;
+    expected = false;
+  };
+  testRelativeNormaliseExample8 = {
+    expr = (builtins.tryEval (path.relativeNormalise "")).success;
+    expected = false;
+  };
+  testRelativeNormaliseExample9 = {
+    expr = (builtins.tryEval (path.relativeNormalise "/foo")).success;
+    expected = false;
+  };
+  testRelativeNormaliseValidDots = {
+    expr = path.relativeNormalise "./foo/.bar/.../baz...qux";
+    expected = "./foo/.bar/.../baz...qux";
+  };
+  testRelativeNormaliseWrongType = {
+    expr = (builtins.tryEval (path.relativeNormalise null)).success;
+    expected = false;
+  };
+  testRelativeNormaliseTwoDots = {
+    expr = (builtins.tryEval (path.relativeNormalise "..")).success;
+    expected = false;
+  };
 }
