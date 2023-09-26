@@ -23833,6 +23833,8 @@ with pkgs;
   microsoft-edge-beta = callPackage (import ../applications/networking/browsers/microsoft-edge).beta { };
   microsoft-edge-dev = callPackage (import ../applications/networking/browsers/microsoft-edge).dev { };
 
+  microsoft-identity-broker = callPackage ../tools/security/microsoft-identity-broker { };
+
   micronucleus = callPackage ../development/tools/misc/micronucleus { };
 
   markdown-anki-decks = callPackage ../tools/misc/markdown-anki-decks { };
@@ -23896,6 +23898,8 @@ with pkgs;
   mqttui = callPackage ../tools/networking/mqttui {
     inherit (darwin.apple_sdk.frameworks) Security;
   };
+
+  msalsdk-dbusclient = callPackage ../development/libraries/msalsdk-dbusclient { };
 
   msgpack = callPackage ../development/libraries/msgpack { };
 
@@ -32347,6 +32351,8 @@ with pkgs;
 
   indigenous-desktop = callPackage ../applications/networking/feedreaders/indigenous-desktop { };
 
+  intune-portal = callPackage ../applications/misc/intune-portal { };
+
   jackline = callPackage ../applications/networking/instant-messengers/jackline { };
 
   jay = callPackage ../applications/window-managers/jay { };
@@ -32839,6 +32845,8 @@ with pkgs;
   jigdo = callPackage ../applications/misc/jigdo { stdenv = gcc10StdenvCompat; };
 
   jitsi = callPackage ../applications/networking/instant-messengers/jitsi { };
+
+  jnr-posix = callPackage ../development/java-modules/jnr-posix { };
 
   joe = callPackage ../applications/editors/joe { };
 
