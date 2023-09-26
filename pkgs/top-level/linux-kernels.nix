@@ -182,6 +182,13 @@ in {
       ];
     };
 
+    linux_6_5 = callPackage ../os-specific/linux/kernel/linux-6.5.nix {
+      kernelPatches = [
+        kernelPatches.bridge_stp_helper
+        kernelPatches.request_key_helper
+      ];
+    };
+
     linux_testing = let
       testing = callPackage ../os-specific/linux/kernel/linux-testing.nix {
         kernelPatches = [
@@ -260,6 +267,7 @@ in {
     linux_5_15_hardened = hardenedKernelFor kernels.linux_5_15 { };
     linux_6_1_hardened = hardenedKernelFor kernels.linux_6_1 { };
     linux_6_4_hardened = hardenedKernelFor kernels.linux_6_4 { };
+    linux_6_5_hardened = hardenedKernelFor kernels.linux_6_5 { };
 
   } // lib.optionalAttrs config.allowAliases {
     linux_4_9 = throw "linux 4.9 was removed because it will reach its end of life within 22.11";
@@ -332,6 +340,8 @@ in {
 
     dddvb = callPackage ../os-specific/linux/dddvb { };
 
+    decklink = callPackage ../os-specific/linux/decklink { };
+
     digimend = callPackage ../os-specific/linux/digimend { };
 
     dpdk-kmods = callPackage ../os-specific/linux/dpdk-kmods { };
@@ -401,6 +411,8 @@ in {
     nvidia_x11_legacy470   = nvidiaPackages.legacy_470;
     nvidia_x11_production  = nvidiaPackages.production;
     nvidia_x11_vulkan_beta = nvidiaPackages.vulkan_beta;
+    nvidia_dc              = nvidiaPackages.dc;
+    nvidia_dc_520          = nvidiaPackages.dc_520;
 
     # this is not a replacement for nvidia_x11*
     # only the opensource kernel driver exposed for hydra to build
@@ -575,6 +587,7 @@ in {
     linux_5_15 = recurseIntoAttrs (packagesFor kernels.linux_5_15);
     linux_6_1 = recurseIntoAttrs (packagesFor kernels.linux_6_1);
     linux_6_4 = recurseIntoAttrs (packagesFor kernels.linux_6_4);
+    linux_6_5 = recurseIntoAttrs (packagesFor kernels.linux_6_5);
   } // lib.optionalAttrs config.allowAliases {
     linux_4_9 = throw "linux 4.9 was removed because it will reach its end of life within 22.11"; # Added 2022-11-08
     linux_5_18 = throw "linux 5.18 was removed because it reached its end of life upstream"; # Added 2022-09-17
@@ -614,6 +627,7 @@ in {
     linux_5_15_hardened = recurseIntoAttrs (packagesFor kernels.linux_5_15_hardened);
     linux_6_1_hardened = recurseIntoAttrs (packagesFor kernels.linux_6_1_hardened);
     linux_6_4_hardened = recurseIntoAttrs (packagesFor kernels.linux_6_4_hardened);
+    linux_6_5_hardened = recurseIntoAttrs (packagesFor kernels.linux_6_5_hardened);
 
     linux_zen = recurseIntoAttrs (packagesFor kernels.linux_zen);
     linux_lqx = recurseIntoAttrs (packagesFor kernels.linux_lqx);
@@ -636,7 +650,7 @@ in {
   packageAliases = {
     linux_default = packages.linux_6_1;
     # Update this when adding the newest kernel major version!
-    linux_latest = packages.linux_6_4;
+    linux_latest = packages.linux_6_5;
     linux_mptcp = throw "'linux_mptcp' has been moved to https://github.com/teto/mptcp-flake";
     linux_rt_default = packages.linux_rt_5_4;
     linux_rt_latest = packages.linux_rt_6_1;

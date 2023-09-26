@@ -5,6 +5,7 @@
 , beautifulsoup4
 , buildPythonPackage
 , certipy
+, configurable-http-proxy
 , cryptography
 , entrypoints
 , fetchPypi
@@ -69,14 +70,14 @@ in
 
 buildPythonPackage rec {
   pname = "jupyterhub";
-  version = "4.0.1";
+  version = "4.0.2";
   format = "setuptools";
 
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-jig/9Z5cQBZxIHfSVJ7XSs2RWjKDb+ACGGeKh4G9ft4=";
+    hash = "sha256-1ORQ7tjZDfvPDsoI8A8gk6C8503FH3z8C3BX9gI0Gh0=";
   };
 
   # Most of this only applies when building from source (e.g. js/css assets are
@@ -96,11 +97,11 @@ buildPythonPackage rec {
 
     substituteInPlace jupyterhub/proxy.py --replace \
       "'configurable-http-proxy'" \
-      "'${nodePackages.configurable-http-proxy}/bin/configurable-http-proxy'"
+      "'${configurable-http-proxy}/bin/configurable-http-proxy'"
 
     substituteInPlace jupyterhub/tests/test_proxy.py --replace \
       "'configurable-http-proxy'" \
-      "'${nodePackages.configurable-http-proxy}/bin/configurable-http-proxy'"
+      "'${configurable-http-proxy}/bin/configurable-http-proxy'"
 
     substituteInPlace setup.py --replace \
       "'npm'" "'true'"
@@ -141,11 +142,6 @@ buildPythonPackage rec {
     importlib-metadata
   ];
 
-  preCheck = ''
-    substituteInPlace jupyterhub/tests/test_spawner.py --replace \
-      "'jupyterhub-singleuser'" "'$out/bin/jupyterhub-singleuser'"
-  '';
-
   nativeCheckInputs = [
     beautifulsoup4
     cryptography
@@ -161,12 +157,18 @@ buildPythonPackage rec {
     virtualenv
   ];
 
+  preCheck = ''
+    substituteInPlace jupyterhub/tests/test_spawner.py --replace \
+      "'jupyterhub-singleuser'" "'$out/bin/jupyterhub-singleuser'"
+    export PATH="$PATH:$out/bin";
+  '';
+
   disabledTests = [
     # Tries to install older versions through pip
     "test_upgrade"
     # Testcase fails to find requests import
     "test_external_service"
-    # attempts to do ssl connection
+    # Attempts to do TLS connection
     "test_connection_notebook_wrong_certs"
     # AttributeError: 'coroutine' object...
     "test_valid_events"

@@ -46,14 +46,14 @@ let
       Carbon
     ;
   } else portaudio;
-in stdenv'.mkDerivation rec {
+in stdenv'.mkDerivation (finalAttrs: {
   pname = "musescore";
   version = "4.1.1";
 
   src = fetchFromGitHub {
     owner = "musescore";
     repo = "MuseScore";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     sha256 = "sha256-jXievVIA0tqLdKLy6oPaOHPIbDoFstveEQBri9M0Aoo=";
   };
   patches = [
@@ -162,10 +162,10 @@ in stdenv'.mkDerivation rec {
     description = "Music notation and composition software";
     homepage = "https://musescore.org/";
     license = licenses.gpl3Only;
-    maintainers = with maintainers; [ vandenoever turion doronbehar ];
+    maintainers = with maintainers; [ vandenoever doronbehar ];
     # on aarch64-linux:
     # error: cannot convert '<brace-enclosed initializer list>' to 'float32x4_t' in assignment
     broken = (stdenv.isLinux && stdenv.isAarch64);
     mainProgram = "mscore";
   };
-}
+})

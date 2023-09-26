@@ -537,7 +537,7 @@ let
     mergeModules' prefix modules
       (concatMap (m: map (config: { file = m._file; inherit config; }) (pushDownProperties m.config)) modules);
 
-  mergeModules' = prefix: options: configs:
+  mergeModules' = prefix: modules: configs:
     let
       # an attrset 'name' => list of submodules that declare ‘name’.
       declsByName =
@@ -554,11 +554,11 @@ let
               else
                 mapAttrs
                   (n: option:
-                    [{ inherit (module) _file; options = option; }]
+                    [{ inherit (module) _file; pos = builtins.unsafeGetAttrPos n subtree; options = option; }]
                   )
                   subtree
               )
-            options);
+            modules);
 
       # The root of any module definition must be an attrset.
       checkedConfigs =
@@ -633,7 +633,7 @@ let
           optionDecls = filter
             (m: m.options?_type
                 && (m.options._type == "option"
-                    || throwDeclarationTypeError loc m.options._type
+                    || throwDeclarationTypeError loc m.options._type m._file
                 )
             )
             decls;
@@ -698,14 +698,14 @@ let
           ) unmatchedDefnsByName);
     };
 
-  throwDeclarationTypeError = loc: actualTag:
+  throwDeclarationTypeError = loc: actualTag: file:
     let
       name = lib.strings.escapeNixIdentifier (lib.lists.last loc);
       path = showOption loc;
       depth = length loc;
 
       paragraphs = [
-        "Expected an option declaration at option path `${path}` but got an attribute set with type ${actualTag}"
+        "In module ${file}: expected an option declaration at option path `${path}` but got an attribute set with type ${actualTag}"
       ] ++ optional (actualTag == "option-type") ''
           When declaring an option, you must wrap the type in a `mkOption` call. It should look somewhat like:
               ${comment}
@@ -762,9 +762,16 @@ let
             else res.options;
         in opt.options // res //
           { declarations = res.declarations ++ [opt._file];
+            # In the case of modules that are generated dynamically, we won't
+            # have exact declaration lines; fall back to just the file being
+            # evaluated.
+            declarationPositions = res.declarationPositions
+              ++ (if opt.pos != null
+                then [opt.pos]
+                else [{ file = opt._file; line = null; column = null; }]);
             options = submodules;
           } // typeSet
-    ) { inherit loc; declarations = []; options = []; } opts;
+    ) { inherit loc; declarations = []; declarationPositions = []; options = []; } opts;
 
   /* Merge all the definitions of an option to produce the final
      config value. */

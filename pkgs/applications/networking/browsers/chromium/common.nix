@@ -294,6 +294,12 @@ let
       # We need the fix for https://bugs.chromium.org/p/chromium/issues/detail?id=1254408:
       base64 --decode ${clangFormatPython3} > buildtools/linux64/clang-format
 
+      # Add final newlines to scripts that do not end with one.
+      # This is a temporary workaround until https://github.com/NixOS/nixpkgs/pull/255463 (or similar) has been merged,
+      # as patchShebangs hard-crashes when it encounters files that contain only a shebang and do not end with a final
+      # newline.
+      find . -type f -perm -0100 -exec sed -i -e '$a\' {} +
+
       patchShebangs .
       # Link to our own Node.js and Java (required during the build):
       mkdir -p third_party/node/linux/node-linux-x64/bin
@@ -361,7 +367,6 @@ let
 
       # Optional features:
       use_gio = true;
-      use_gnome_keyring = false; # Superseded by libsecret
       use_cups = cupsSupport;
 
       # Feature overrides:
@@ -384,6 +389,8 @@ let
       # We do intentionally not set rustc_version as nixpkgs will never do incremental
       # rebuilds, thus leaving this empty is fine.
       rust_sysroot_absolute = "${rustc}";
+      # Building with rust is disabled for now - this matches the flags in other major distributions.
+      enable_rust = false;
     } // lib.optionalAttrs (!(stdenv.buildPlatform.canExecute stdenv.hostPlatform)) {
       # https://www.mail-archive.com/v8-users@googlegroups.com/msg14528.html
       arm_control_flow_integrity = "none";
