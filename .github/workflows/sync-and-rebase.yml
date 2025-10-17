@@ -3,7 +3,7 @@ name: Sync and Create Rebase PR
 on:
   workflow_dispatch:  # Allows manual triggering
   schedule:
-    - cron: '0 0 * * 0'  # Runs weekly at midnight UTC on Sunday
+    - cron: '0 2 */2 * *'  # Runs every two day at 2AM UTC
 
 permissions:
   contents: write
