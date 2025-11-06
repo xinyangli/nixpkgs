@@ -19,6 +19,10 @@ appimageTools.wrapAppImage {
 
   src = appimageContents;
 
+  profile = ''
+    export QT_IM_MODULE=fcitx
+  '';
+
   extraInstallCommands = ''
     mkdir -p $out/share/applications
     cp ${appimageContents}/wechat.desktop $out/share/applications/
