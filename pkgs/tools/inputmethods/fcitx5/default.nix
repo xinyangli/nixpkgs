@@ -5,6 +5,7 @@
   fetchFromGitHub,
   pkg-config,
   buildPackages,
+  makeBinaryWrapper,
   cmake,
   extra-cmake-modules,
   wayland-scanner,
@@ -26,6 +27,7 @@
   libXdmcp,
   libsepol,
   libxkbcommon,
+  librsvg,
   libthai,
   libdatrie,
   xcbutilkeysyms,
@@ -62,6 +64,7 @@ stdenv.mkDerivation rec {
     cmake
     extra-cmake-modules
     pkg-config
+    makeBinaryWrapper
     wayland-scanner
     gettext
   ];
@@ -82,6 +85,7 @@ stdenv.mkDerivation rec {
     json_c
     libGL
     libuuid
+    librsvg
     libselinux
     libsepol
     libXdmcp
@@ -97,6 +101,12 @@ stdenv.mkDerivation rec {
   cmakeFlags = lib.optionals (!stdenv.buildPlatform.canExecute stdenv.hostPlatform) [
     (lib.cmakeFeature "CMAKE_CROSSCOMPILING_EMULATOR" (stdenv.hostPlatform.emulator buildPackages))
   ];
+
+  # Required for the program to properly load themes containing SVG
+  postInstall = ''
+    wrapProgram $out/bin/fcitx5 \
+      --set GDK_PIXBUF_MODULE_FILE "${librsvg}/${gdk-pixbuf.moduleDir}.cache"
+  '';
 
   strictDeps = true;
 
